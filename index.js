@@ -9,6 +9,7 @@ async function start(){
     if (err) {
       console.log(err)
       process.exit(1)
+      
     }
     console.log(`listening on port ${ process.env.PORT }`)
   })
