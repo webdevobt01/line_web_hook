@@ -1,0 +1,119 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  username String @unique @db.VarChar(50)
+  password String
+  firstname String @db.VarChar(100)
+  lastname String @db.VarChar(100)
+  uid_line String @unique
+  department String? @db.VarChar(70)
+  position String? @db.VarChar(70)
+  tierId Int
+  tier Tiers @relation(fields: [tierId], references: [id])
+  phone String @db.VarChar(50)
+  referId Int
+  enable Boolean @default(false)
+  token   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deleted DateTime?
+  Resets    Resetpasswordtokens[]
+  Event_leaves Event_leaves[]
+  User_event_maps User_event_maps[]
+}
+
+model Tiers {
+  id        Int     @id @default(autoincrement())
+  name     String @db.VarChar(70)
+  users Users[]
+}
+
+model Resetpasswordtokens {
+  id        Int     @id @default(autoincrement())
+  token   String
+  userId  Int
+  user    Users    @relation(fields: [userId], references: [id])
+}
+
+model Holidays {
+  id        Int     @id @default(autoincrement())
+  name     String @db.VarChar(100)
+  date   DateTime?
+  enable Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deleted DateTime?
+}
+
+model Event_work_times {
+  id        Int     @id @default(autoincrement())
+  lat String? @db.VarChar(50)
+  long String? @db.VarChar(50)
+  typeId Int
+  type Type_event_works @relation(fields: [typeId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deleted DateTime?
+}
+
+model Type_event_works {
+  id        Int     @id @default(autoincrement())
+  name String @db.VarChar(50)
+  description String @db.VarChar(100)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deleted DateTime?
+  Event_work_times Event_work_times[]
+}
+
+model Event_leaves {
+  id        Int     @id @default(autoincrement())
+  startDate DateTime
+  endDate DateTime
+  description String @db.VarChar(100)
+  work String @db.VarChar(100)
+  referId Int
+  totol String? @db.VarChar(10)
+  typeId Int
+  type Type_event_leaves @relation(fields: [typeId], references: [id])
+  userId  Int
+  user    Users    @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deleted DateTime?
+}
+
+model Type_event_leaves {
+  id        Int     @id @default(autoincrement())
+  name String @db.VarChar(100)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deleted DateTime?
+  Event_leaves Event_leaves[]
+  User_event_maps User_event_maps[]
+}
+
+model User_event_maps {
+  id        Int     @id @default(autoincrement())
+  userId  Int
+  user    Users    @relation(fields: [userId], references: [id])
+  used Int @default(0)
+  max Int @default(0)
+  typeleaveId Int
+  typeleave Type_event_leaves @relation(fields: [typeleaveId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deleted DateTime?
+}
